@@ -80,30 +80,42 @@ This is done with the assumption that validating a single dataset is fast, and t
 to handle each error directly as it appears (if this assumption turns out not to hold, this
 behavior may change in the future).
 
-Note that the error handling API is very simple. If you do not want to do any handling, you
-can write a null handler:
+Note that the error handling API is very simple.
+
+A null handler
+~~~~~~~~~~~~~~
+If you do not want to do any handling, you can use
+:class:`~dicom_validator.validator.error_handler.NullValidationResultHandler`, a
+handler that does no reporting:
 
 .. code:: python
 
-    from dicom_validator.validator.error_handler import ValidationResultHandler
-
-    class NullValidationResultHandler(ValidationResultHandler):
-        """Handler that does nothing."""
-
-        def handle_validation_start(self, result: ValidationResult):
-            pass
-
-        def handle_validation_result(self, result: ValidationResult):
-            pass
-
-And use this for your validation:
-
-.. code:: python
+    from dicom_validator.validator.error_handler import NullValidationResultHandler
 
     validator = IODValidator(ds, dicom_info, error_handler=NullValidationResultHandler())
     result = validator.validate()
-    # handle result yourself
+    # handle the result yourself
 
+Formatting results and errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you want to render `TagError` or `ValidationResult` objects as human-readable text
+without writing your own formatting, you can use
+:class:`~dicom_validator.validator.error_handler.ValidationResultFormatter`.
+
+This works well together with a null handler: validate as shown above, then format the `result`
+it returns:
+
+.. code:: python
+
+    from dicom_validator.validator.error_handler import ValidationResultFormatter
+
+    formatter = ValidationResultFormatter(dicom_info.dictionary)
+    for module_name, tag_errors in result.module_errors.items():
+        for tag_id, error in tag_errors.items():
+            print(f"{module_name}: {tag_id}{formatter.error_message(error)}")
+
+Custom handlers
+~~~~~~~~~~~~~~~
 You could also move your result handling into `handle_validation_result`.
 The more useful option is to base your handler on
 :class:`~dicom_validator.validator.error_handler.ValidationResultHandlerBase`. This already provides
