@@ -2,7 +2,8 @@
 The released versions correspond to PyPi releases.
 `dicom-validator` versions follow [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## [Version 0.9.0](https://pypi.python.org/pypi/dicom-validator/0.9.0) (2026-09-09)
+Slightly changed public API.
 
 ### Breaking changes
 * `LoggingResultHandler.error_message` and `HtmlErrorHandler.error_message`/`tag_name`
